@@ -46,7 +46,15 @@ def goodLinkHFunc(title, info):
         mTKeyG[hVal] = [[title, info]]
 # 2 Linear Probing Hash Table Quote as Key
 # Poor Hash Function
-
+def poorLinearHFunc(quote, info):
+    global mQKeyP
+    hVal = len(quote)%listSize
+    if mQKeyP[hVal][0] != 0:
+        for i in range(len(mQKeyP[hVal + 1:len(mQKeyP)])):
+            if(mQKeyP[i] == 0):
+                mQKeyP.insert(i, [quote, info])
+    else:
+        mQKeyP[hVal] = [quote,info]
 # Good Hash Function
 
 # Best of the 4 with more optimization
@@ -55,16 +63,17 @@ def main():
     global wastedSpace
     global mTKeyP
     global mTKeyG
+    global mQKeyP
     time = t.time()
     with open("MOCK_DATA.csv", "r") as f:
         fLines = f.readlines()
         for line in fLines:
             lList = line.split(",")
-            title = lList[0]
-            info = lList[1:len(lList)]
-            goodLinkHFunc(title, info)
+            quote = lList[len(lList) - 1]
+            info = lList[0:len(lList) - 1]
+            poorLinearHFunc(quote, info)
     time = t.time() - time
-    for i in mTKeyG:
+    for i in mQKeyP:
         if i[0] == 0:
             wastedSpace += 1
     print(f"Time: {time:.2f}\nCollisons: {collisions}\nWasted Space: {wastedSpace}")
