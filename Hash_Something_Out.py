@@ -18,6 +18,7 @@ collisions = 0
 # Poor Hash Function
 def poorLinkHFunc(title, info):
     global mTKeyP
+    global listSize
     hVal = len(title) % listSize
     if mTKeyP[hVal][0] != 0:
         #newList = mTKeyP[hVal][0:len(mTKeyP[hVal])]
@@ -32,6 +33,7 @@ def poorLinkHFunc(title, info):
 # Good Hash Function
 def goodLinkHFunc(title, info):
     global mTKeyG
+    global listSize
     hVal = 0
     for i in title:
         hVal += ord(i)
@@ -48,11 +50,27 @@ def goodLinkHFunc(title, info):
 # Poor Hash Function
 def poorLinearHFunc(quote, info):
     global mQKeyP
-    hVal = len(quote)%listSize
+    global collisions
+    global listSize
+    hVal = len(quote) % listSize
+    # For some reason puts the collided item in from the beginning i think has to do with lProbeSpot
+    curVal = mQKeyP[hVal][0]
+    #print(f"hVal = {hVal},Quote = {quote}, Quote at hVal = {curVal}")
     if mQKeyP[hVal][0] != 0:
         for i in range(len(mQKeyP[hVal + 1:len(mQKeyP)])):
-            if(mQKeyP[i] == 0):
-                mQKeyP.insert(i, [quote, info])
+            if(mQKeyP[hVal + i][0] == 0):
+                # This always returns the first index of the list
+                lProbeSpot = (hVal + i) % listSize
+                mQKeyP[lProbeSpot] = [quote, info]
+                break
+        if([quote, info] not in mQKeyP):
+            for i in range(len(mQKeyP[:hVal])):
+                if(mQKeyP[hVal + i][0] == 0):
+                    lProbeSpot = (hVal + i) % listSize
+                    mQKeyP[lProbeSpot] = [quote, info]
+                    break
+        collisions += 1
+
     else:
         mQKeyP[hVal] = [quote,info]
 # Good Hash Function
