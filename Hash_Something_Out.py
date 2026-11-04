@@ -62,9 +62,9 @@ def main():
             lList = line.split(",")
             title = lList[0]
             info = lList[1:len(lList)]
-            poorLinkHFunc(title, info)
+            goodLinkHFunc(title, info)
     time = t.time() - time
-    for i in mTKeyP:
+    for i in mTKeyG:
         if i[0] == 0:
             wastedSpace += 1
     print(f"Time: {time:.2f}\nCollisons: {collisions}\nWasted Space: {wastedSpace}")
