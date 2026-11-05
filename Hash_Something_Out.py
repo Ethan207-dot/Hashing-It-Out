@@ -9,7 +9,7 @@ mTKeyP = [[0]] * listSize
 mTKeyG = [[0]] * listSize
 mQKeyP = [[0]] * listSize
 mQKeyG = [[0]] * listSize
-best = [[0]] * listSize
+mBest = [[0]] * listSize
 
 wastedSpace = 0
 collisions = 0
@@ -21,10 +21,8 @@ def poorLinkHFunc(title, info):
     global listSize
     hVal = len(title) % listSize
     if mTKeyP[hVal][0] != 0:
-        #newList = mTKeyP[hVal][0:len(mTKeyP[hVal])]
         # If doesnt work switch back to newList
         mTKeyP.append([title, info])
-        #mTKeyP[hVal] = newList
         global collisions 
         collisions += 1
     else:
@@ -39,9 +37,7 @@ def goodLinkHFunc(title, info):
         hVal += ord(i)
     hVal = (hVal * 17431) % listSize
     if mTKeyG[hVal][0] != 0:
-        #newList = mTKeyG[hVal][0:len(mTKeyG[hVal])]
         mTKeyG.append([title, info])
-        #mTKeyG[hVal] = newList
         global collisions 
         collisions += 1
     else:
@@ -53,35 +49,59 @@ def poorLinearHFunc(quote, info):
     global collisions
     global listSize
     hVal = len(quote) % listSize
-    # For some reason puts the collided item in from the beginning i think has to do with lProbeSpot
-    curVal = mQKeyP[hVal][0]
-    #print(f"hVal = {hVal},Quote = {quote}, Quote at hVal = {curVal}")
     if mQKeyP[hVal][0] != 0:
-        for i in range(len(mQKeyP[hVal + 1:len(mQKeyP)])):
-            if(mQKeyP[hVal + i][0] == 0):
-                # This always returns the first index of the list
-                lProbeSpot = (hVal + i) % listSize
+        for i in range(len(mQKeyP)):
+            if(mQKeyP[(hVal + (i + 1)) % listSize][0] == 0):
+                lProbeSpot = (hVal + (i + 1)) % listSize
                 mQKeyP[lProbeSpot] = [quote, info]
                 break
-        if([quote, info] not in mQKeyP):
-            for k in range(len(mQKeyP[0:hVal])):
-                # Probably shouldn't have hVal + i since I want to go throught he first part of the list
-                if(mQKeyP[k][0] == 0):
-                    lProbeSpot = (k) % listSize
-                    mQKeyP[lProbeSpot] = [quote, info]
-                    break
         collisions += 1
     else:
         mQKeyP[hVal] = [quote,info]
 # Good Hash Function
-
+def goodLinearHFunc(quote, info):
+    global mQKeyG
+    global collisions
+    global listSize
+    hVal = 0
+    for i in quote:
+        hVal += ord(i)
+    hVal = (hVal * 17431) % listSize
+    if mQKeyG[hVal][0] != 0:
+        for i in range(len(mQKeyG)):
+            if(mQKeyG[(hVal + (i+1)) % listSize][0] == 0):
+                lProbeSpot = (hVal + (i + 1)) % listSize
+                mQKeyG[lProbeSpot] = [quote, info]
+                break
+        collisions += 1
+    else:
+        mQKeyG[hVal] = [quote,info]
 # Best of the 4 with more optimization
+# def best(quote, info):
+#     global mBest
+#     global collisions
+#     global listSize
+#     hVal = 0
+#     for i in quote:
+#         hVal += ord(i)
+#     hVal = (hVal * 17431) % 499 % listSize
+#     if mBest[hVal][0] != 0:
+#         for i in range(len(mBest)):
+#             if(mBest[(hVal + (i+1)) % listSize][0] == 0):
+#                 lProbeSpot = (hVal + (i + 1)) % listSize
+#                 mBest[lProbeSpot] = [quote, info]
+#                 break
+#         collisions += 1
+#     else:
+#         mBest[hVal] = [quote,info]
 
 def main():
     global wastedSpace
     global mTKeyP
     global mTKeyG
     global mQKeyP
+    global mQKeyG
+    global mBest
     time = t.time()
     with open("MOCK_DATA.csv", "r") as f:
         fLines = f.readlines()
@@ -89,10 +109,10 @@ def main():
             lList = line.split(",")
             quote = lList[len(lList) - 1]
             info = lList[0:len(lList) - 1]
-            poorLinearHFunc(quote, info)
+            goodLinearHFunc(quote, info)
     time = t.time() - time
-    for i in mQKeyP:
-        if i[0] == 0:
+    for i in range(len(mQKeyG)):
+        if mQKeyG[i][0] == 0:
             wastedSpace += 1
     print(f"Time: {time:.2f}\nCollisons: {collisions}\nWasted Space: {wastedSpace}")
 
