@@ -64,13 +64,13 @@ def poorLinearHFunc(quote, info):
                 mQKeyP[lProbeSpot] = [quote, info]
                 break
         if([quote, info] not in mQKeyP):
-            for i in range(len(mQKeyP[:hVal])):
-                if(mQKeyP[hVal + i][0] == 0):
-                    lProbeSpot = (hVal + i) % listSize
+            for i in range(len(mQKeyP[0:hVal])):
+                # Probably shouldn't have hVal + i since I want to go throught he first part of the list
+                if(mQKeyP[i][0] == 0):
+                    lProbeSpot = (i) % listSize
                     mQKeyP[lProbeSpot] = [quote, info]
                     break
         collisions += 1
-
     else:
         mQKeyP[hVal] = [quote,info]
 # Good Hash Function
