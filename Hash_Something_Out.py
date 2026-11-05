@@ -77,23 +77,23 @@ def goodLinearHFunc(quote, info):
     else:
         mQKeyG[hVal] = [quote,info]
 # Best of the 4 with more optimization
-# def best(quote, info):
-#     global mBest
-#     global collisions
-#     global listSize
-#     hVal = 0
-#     for i in quote:
-#         hVal += ord(i)
-#     hVal = (hVal * 17431) % 499 % listSize
-#     if mBest[hVal][0] != 0:
-#         for i in range(len(mBest)):
-#             if(mBest[(hVal + (i+1)) % listSize][0] == 0):
-#                 lProbeSpot = (hVal + (i + 1)) % listSize
-#                 mBest[lProbeSpot] = [quote, info]
-#                 break
-#         collisions += 1
-#     else:
-#         mBest[hVal] = [quote,info]
+def best(quote, info):
+    global mBest
+    global collisions
+    global listSize
+    hVal = 0
+    for i in quote:
+        hVal += ord(i)
+    hVal = (hVal % 499) * 17431 % listSize
+    if mBest[hVal][0] != 0:
+        for i in range(len(mBest)):
+            if(mBest[(hVal + (i+1)) % listSize][0] == 0):
+                lProbeSpot = (hVal + (i + 1)) % listSize
+                mBest[lProbeSpot] = [quote, info]
+                break
+        collisions += 1
+    else:
+        mBest[hVal] = [quote,info]
 
 def main():
     global wastedSpace
@@ -109,10 +109,10 @@ def main():
             lList = line.split(",")
             quote = lList[len(lList) - 1]
             info = lList[0:len(lList) - 1]
-            goodLinearHFunc(quote, info)
+            best(quote, info)
     time = t.time() - time
-    for i in range(len(mQKeyG)):
-        if mQKeyG[i][0] == 0:
+    for i in range(len(mBest)):
+        if mBest[i][0] == 0:
             wastedSpace += 1
     print(f"Time: {time:.2f}\nCollisons: {collisions}\nWasted Space: {wastedSpace}")
 
